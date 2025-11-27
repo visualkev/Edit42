@@ -353,24 +353,31 @@ class edit42():
 		if self.cfg_src=='api':
 			payload={'path': self.channel_selected, 'data': json.dumps({'station_conf':self.chan_data}, indent=4)}
 			ret=self.configs.set_api_conf(payload)
-			if ret=="Saved":
-				self.win42.statusBar().showMessage(ret, 3000)
-				self.flasher=QTimer()
-				self.flasher.setInterval(50)
-				self.flasher.setSingleShot(False)
-				self.flasher.timeout.connect(self.flashit)
-				self.flash_count=0
-				self.flashit()
+			if ret=="Saved": self.set_saved_indicate()
+			else: self.error_save()
+				
 		else:
 			cfg_file= self.channel_selected['path']
 			#print(cfg_file, self.chan_data)
 			payload={'path': cfg_file, 'data':{'station_conf':self.chan_data}}
-			self.configs.set_file_conf(payload)
-
+			ret=self.configs.set_file_conf(payload)
+			if ret=="Saved": self.set_saved_indicate()
+			else: self.error_save()
 		print("Saved")
 		self.is_changed=False
 		self.update_wintitle(changed=self.is_changed)
-		
+	
+	def set_saved_indicate(self):
+		self.win42.statusBar().showMessage("Saved", 3000)
+		self.flasher=QTimer()
+		self.flasher.setInterval(50)
+		self.flasher.setSingleShot(False)
+		self.flasher.timeout.connect(self.flashit)
+		self.flash_count=0
+		self.flashit()
+
+	def error_save(self):
+		print("save ERROR")
 
 	def open_cfg(self):
 #		fileName = QFileDialog.getOpenFileName(self.win42, "Open FS42 Station Config Files", "/home/kkurtz/Documents/bash-scripts/edit42/confs", "Json Files (*json)")

@@ -43,7 +43,7 @@ class Get_confs():
 		try:
 			response = requests.get(self.url_summary, headers=self.headers) #, json=data)
 		except requests.exceptions.RequestException as e:
-			print(f"\n\t{red}Tern on yer fekin' server, ye fekin' Fekass!!{nc}\n\n")
+			print(f"\n\t{red}Is your fs42 running?{nc}\n\n")
 			exit()
 		temp=response.json()
 		self.chanlist=temp['network_names']
@@ -56,7 +56,7 @@ class Get_confs():
 		try:
 			response = requests.get(self.url, headers=self.headers) #, json=data)
 		except requests.exceptions.RequestException as e:
-			print(f"\n\t{red}Tern on yer fekin' server, ye fekin' Fekass!!{nc}\n\n")
+			print(f"\n\t{red}Is your fs42 running?{nc}\n\n")
 			exit()
 		self.chaninfo=response.json()
    		
@@ -74,26 +74,21 @@ class Get_confs():
 		try:
 			response = requests.get(f"{self.urlbase}{fyl}", headers=self.headers) #, json=data)
 		except requests.exceptions.RequestException as e:
-			print(f"\n\t{red}Tern on yer fekin' server, ye fekin' Fekass!!{nc}\n\n")
+			print(f"\n\t{red}Is your fs42 running?{nc}\n\n")
 			exit()
-		
 		temp=response.json()
-		
 		return temp['station_config']['station_conf']
 
 	def set_api_conf(self, fyl):
-		#print(fyl['data'])
 		try:
 			response = requests.put(f"{self.urlbase}{fyl['path']}",data=fyl['data'], headers=self.headers) 
 		except requests.exceptions.RequestException as e:
-			print(f"\n\t{red}Tern on yer fekin' server, ye fekin' Fekass!!{nc}\n\n")
+			print(f"\n\t{red}Is your fs42 running?{nc}\n\n")
 			exit()
 		temp=response.json()
 		if 'success' in temp:
 			return "Saved"
 		
-
-
 	def get_network_name(self, file):
 		with open( file) as conf:
 			data = json.load(conf)
@@ -111,8 +106,13 @@ class Get_confs():
 
 	def set_file_conf(self, fyl):
 		#print(type(fyl['path']), fyl['path'])
-		with open(fyl['path'], "w") as conf:
-			json.dump(fyl['data'], conf)
+		try:
+			with open(fyl['path'], "w") as conf:
+				json.dump(fyl['data'], conf)
+		except OSError:
+			print(f"{red}OS error{nc}")
+			return "Not Saved"
+		return "Saved"
 
 	def get_snipp_file(self, fyl):
 		try:
