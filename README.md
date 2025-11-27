@@ -2,7 +2,7 @@
 It is a desktop configuration editor for FieldStation42 station files, written in python and PySide6  
 This project is tremendously inspired by the FieldStation42 project  
 
-## Initial Features:
+## Current Features:
  - syntax highlighting  
  - quick navigation to config elements from dropdown lists automatically configured based on the content of a given station config  
  - json error checking as you type  
