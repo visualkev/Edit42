@@ -1,5 +1,5 @@
 # Edit42
-It is desktop configuration editor for FieldStation42 station files, written in python and PySide6  
+It is a desktop configuration editor for FieldStation42 station files, written in python and PySide6  
 This project is tremendously inspired by the FieldStation42 project  
 
 ## Initial Features:
