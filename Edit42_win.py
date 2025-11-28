@@ -438,7 +438,7 @@ class edit42_win(QMainWindow):
 				self.toolbar2.show()
 				self.statusJ_lbl.clicked.connect(self.appclass42.mark_error_pos)
 				self.appclass42.open_cfg()
-				print("at startup", str(self.appclass42.chan_data)[:50])
+				self.editbox.setFocus()
 				
 		if index==2:
 			self.statusJ_lbl.clicked.connect(self.insert_form.mark_error_pos)

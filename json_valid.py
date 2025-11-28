@@ -14,9 +14,12 @@ nc="\033[0m"
 
 class json_valid():
 	def __init__(self, content=None):
-		if content is not None: self.signature=self.get_signature(self.remove_newlines(content))
+		if content is not None: 
+			self.signature=self.get_signature(self.remove_newlines(content))
+			self.valid_json=json.loads(content)
+		else:
+			self.valid_json=None
 		self.json_is_good=False
-		self.valid_json=None
 		self.station_schema=None
 		self.content=None
 		self.good_syntax=False
