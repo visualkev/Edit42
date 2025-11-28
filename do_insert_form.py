@@ -74,6 +74,7 @@ class Insert_form():
 		self.w42.ip_name_lbl.setText("Name:")
 		self.w42.ip_name_lbl.setMaximumSize(QSize(250, 43))
 		self.w42.ip_name_lbl.setStyleSheet("padding: 5px;")
+		self.w42.ip_name_lbl.setPalette(self.w42.custom_palette)
 		self.w42.ip_name_lbl.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 		self.w42.ip_hl_row1.addWidget(self.w42.ip_name_lbl)
 
@@ -82,7 +83,8 @@ class Insert_form():
 		self.w42.ip_txtName.setMinimumSize(QSize(300, 30))
 		self.w42.ip_txtName.setMaximumSize(QSize(350, 50))
 		self.w42.ip_txtName.setBaseSize(QSize(320, 35))
-		self.w42.ip_txtName.setStyleSheet('padding: 5px; color: "#decce5"; background-color:"#382b52";')
+		self.w42.ip_txtName.setStyleSheet('padding: 5px; ')
+		self.w42.ip_txtName.setPalette(self.w42.custom_palette)
 		self.w42.ip_txtName.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.w42.ip_hl_row1.addWidget(self.w42.ip_txtName)
 		self.w42.ip_vertl1.addLayout(self.w42.ip_hl_row1)
@@ -91,7 +93,8 @@ class Insert_form():
 		self.w42.ip_btn_save_snipp = QPushButton(self.w42.insert_page)
 		self.w42.ip_btn_save_snipp.setText("Save Item for reuse")
 		self.w42.ip_btn_save_snipp.setMaximumSize(QSize(200, 16777215))
-		self.w42.ip_btn_save_snipp.setStyleSheet(u"padding: 5px;")
+		self.w42.ip_btn_save_snipp.setStyleSheet("padding: 5px;")
+		self.w42.ip_btn_save_snipp.setPalette(self.w42.custom_palette)
 		self.w42.ip_horizl3.addWidget(self.w42.ip_btn_save_snipp)
 
 		self.w42.ip_fr_new_chk = QCheckBox(self.w42.insert_page)
@@ -106,7 +109,8 @@ class Insert_form():
 		self.w42.ip_fr_new_chk.setBaseSize(QSize(155, 43))
 		self.w42.ip_fr_new_chk.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 		self.w42.ip_fr_new_chk.setAutoFillBackground(False)
-		self.w42.ip_fr_new_chk.setStyleSheet(u"padding: 5px;")
+		#self.w42.ip_fr_new_chk.setStyleSheet(u"padding: 5px;")
+		self.w42.ip_fr_new_chk.setPalette(self.w42.custom_palette)
 		self.w42.ip_horizl3.addWidget(self.w42.ip_fr_new_chk)
 		self.w42.ip_vertl1.addLayout(self.w42.ip_horizl3)
 		self.w42.ip_horizl2 = QHBoxLayout()
@@ -117,9 +121,10 @@ class Insert_form():
 		sizePolicy1.setHorizontalStretch(0)
 		sizePolicy1.setVerticalStretch(0)
 		sizePolicy1.setHeightForWidth(self.w42.ip_copyfr_lbl.sizePolicy().hasHeightForWidth())
-		self.w42.ip_copyfr_lbl.setSizePolicy(sizePolicy1)
+		#self.w42.ip_copyfr_lbl.setSizePolicy(sizePolicy1)
+		self.w42.ip_copyfr_lbl.setPalette(self.w42.custom_palette)
 		self.w42.ip_copyfr_lbl.setMaximumSize(QSize(170, 43))
-		self.w42.ip_copyfr_lbl.setStyleSheet(u"padding: 5px")
+		#self.w42.ip_copyfr_lbl.setStyleSheet(u"padding: 5px")
 		self.w42.ip_copyfr_lbl.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 		self.w42.ip_horizl2.addWidget(self.w42.ip_copyfr_lbl)
 
@@ -131,7 +136,8 @@ class Insert_form():
 		self.w42.ip_list_of.setSizePolicy(sizePolicy2)
 		self.w42.ip_list_of.setMinimumSize(QSize(0, 30))
 		self.w42.ip_list_of.setMaximumSize(QSize(300, 16777215))
-		self.w42.ip_list_of.setStyleSheet(u"padding: 5px;")
+		self.w42.ip_list_of.setStyleSheet("padding: 5px;")
+		self.w42.ip_list_of.setPalette(self.w42.custom_palette)
 		self.w42.ip_horizl2.addWidget(self.w42.ip_list_of)
 		self.w42.ip_vertl1.addLayout(self.w42.ip_horizl2)
 		self.w42.ip_vertl3.addLayout(self.w42.ip_vertl1)
@@ -139,15 +145,17 @@ class Insert_form():
 		self.w42.ip_insert_preview = QPlainTextEdit(self.w42.insert_page)
 		self.w42.ip_insert_preview.setEnabled(True)
 		self.w42.ip_insert_preview.setStyleSheet('color: "#decce5"; background-color: "#382b52"; font: 18px Tahoma, sans-serif;')
+		#self.w42.ip_insert_preview.setPalette(self.w42.custom_palette)
 		self.w42.ip_insert_preview.setTabStopDistance(4.000000000000000)
 		self.w42.ip_vertl3.addWidget(self.w42.ip_insert_preview)
 		self.w42.ip_horizl_buttons=QHBoxLayout()
 
 		self.w42.ip_btn_insert = QPushButton(self.w42.insert_page)
 		self.w42.ip_btn_insert.setText("Insert")
-
+		self.w42.ip_btn_insert.setPalette(self.w42.custom_palette)
 		self.w42.ip_btn_cancel = QPushButton(self.w42.insert_page)
 		self.w42.ip_btn_cancel.setText("Cancel")
+		self.w42.ip_btn_cancel.setPalette(self.w42.custom_palette)
 		self.w42.ip_btn_cancel.clicked.connect(self.on_cancel_click)
 		self.w42.ip_horizl_buttons.addWidget(self.w42.ip_btn_cancel)
 		self.w42.ip_horizl_buttons.addWidget(self.w42.ip_btn_insert)
@@ -209,13 +217,13 @@ class Insert_form():
 		if retval[1]:
 			print("good")
 			self.w42.statusJ_lbl.setText(f"Json: OK")
-			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_styleb)
+			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_styleb)
 			tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")+ ","
 		elif not retval[1]:
 			e=retval[3][0]
 			print("syntax", e[:50])
 			self.w42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
-			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_styleb)
+			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_styleb)
 			return
 		
 		self.w42.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
@@ -323,13 +331,13 @@ class Insert_form():
 		if retval[1]:
 			print("good")
 			self.w42.statusJ_lbl.setText(f"Json: OK")
-			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_styleb)
+			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_styleb)
 			tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")+ ","
 		elif not retval[1]:
 			e=retval[3][0]
 			print("syntax", e[:50])
 			self.w42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
-			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_styleb)
+			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_styleb)
 		
 	def reset_text4(self):
 		self.w42.ip_list_of.currentIndexChanged.disconnect()

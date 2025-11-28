@@ -1,7 +1,15 @@
 #!/usr/bin/python
 
 from PySide6.QtCore import QSize, Qt, QTimer, QRect
-from PySide6.QtGui import (QAction, QIcon, QKeySequence, QFont, QTextCursor, QColor, QTextFormat, QScreen)
+from PySide6.QtGui import (
+	QAction, 
+	QIcon, 
+	QKeySequence, 
+	QFont, 
+	QTextCursor, 
+	QColor,
+	QTextFormat, 
+	QScreen)
 from PySide6.QtWidgets import (
     QApplication,
     QStackedWidget,
@@ -25,7 +33,7 @@ from PySide6.QtWidgets import (
     QFileDialog
 )
 from Edit42 import edit42
-
+from custom_palette import custom_palette
 from do_insert_form import Insert_form
 
 
@@ -54,19 +62,22 @@ class edit42_win(QMainWindow):
 		self.last_search_cursor=None
 		self.appclass42=None
 		self.setup_stack()
+		self.custom_palette=custom_palette()
+		self.setPalette(self.custom_palette)
 		self.setup_part1()
-		print("init win")
+		print("init win", type(self.custom_palette))
 		self.previous_page=self.edit42_stack.currentIndex()
+
 		
 		if self.appconf is None:
 			self.setup_initial()
 			self.edit42_stack.setCurrentIndex(0)			
 		else:
-			#self.setup_part2()
+			
 			self.edit42_stack.setCurrentIndex(1)
 		self.insert_form=Insert_form(self.appclass42, self)
 		
-
+	
 
 	def set_wingeom(self):
 		screen_width=self.screen_rect.width()
@@ -108,7 +119,8 @@ class edit42_win(QMainWindow):
 		#self.setFont(self.mainfont)
 		self.setMinimumSize(QSize(650, 400))#1a053a
 		self.setBaseSize(QSize(750, 900))
-		self.setStyleSheet('color: "#32fbe2"; background-color:"#1a053a"; selection-color: rgb(255, 255, 255); selection-background-color: "#5e5c64"; font: 16px Tahoma, sans-serif;')
+		#self.setStyleSheet('color: "#32fbe2"; background-color:"#1a053a"; selection-color: rgb(255, 255, 255); selection-background-color: "#5e5c64"; font: 16px Tahoma, sans-serif;')
+		self.setStyleSheet('font: 16px Tahoma, sans-serif;')
 		
 	def setup_part2(self):
 		print("setup part2")
@@ -117,10 +129,12 @@ class edit42_win(QMainWindow):
 		self.setup_comboboxes()
 		self.setup_toolbar()
 		self.setup_editbox()
-		self.setStatusBar(QStatusBar(self))
+		self.statusbar42=QStatusBar(self)
+		self.setStatusBar(self.statusbar42)
+		self.statusbar42.setPalette(self.custom_palette)
 		statuslbl_style='color: "#bfb6cd"; padding: 5px;'
 		self.statusJ_lbl=QPushButton(self, text="Json: --")
-		self.statusJ_lbl.setStyleSheet('color: "#bfb6cd"; padding: 5px; font-weight: bold;')
+		self.statusJ_lbl.setStyleSheet('color: "#bfb6cd"; background-color: "#442b69"; font-weight: bold;')
 		self.statusS_lbl=QLabel(self, text="<b>Schema</b>: --")
 		self.statusS_lbl.setStyleSheet(statuslbl_style)
 		self.statusS_lbl.setWordWrap(False)
@@ -136,6 +150,7 @@ class edit42_win(QMainWindow):
 		self.editbox = QPlainTextEdit(self.editor_page)
 		self.vertmain.addWidget(self.editbox)
 		self.editbox.setStyleSheet('color: "#decce5"; background-color: #382b52; font: 18px Tahoma, sans-serif;')
+		#self.editbox.setPalette(self.custom_palette)
 		
 	
 	def setup_actions(self):
@@ -160,6 +175,7 @@ class edit42_win(QMainWindow):
 		
 	def setup_menubar(self):
 		menu = self.menuBar()
+		menu.setPalette(self.custom_palette)
 		file_menu = menu.addMenu("&File")
 		file_menu.addAction(self.open_action)
 		file_menu.addAction(self.new_action)
@@ -172,31 +188,35 @@ class edit42_win(QMainWindow):
 		qsize_min=QSize(150, 30)
 		qsize_max=QSize(250, 40)
 		qsize_base=QSize(150, 30)
-		combo_style='background-color: "#333"; margin: 1px 5px; padding: 1px;'
+		combo_style='margin: 3px; padding:1px;'
 		self.chan_listbox=QComboBox(self.editor_page)
 		self.override_indexes_listbox=QComboBox(self.editor_page)
 		self.daytemp_indexes_listbox=QComboBox(self.editor_page)
 		self.indexes_listbox=QComboBox(self.editor_page)
 		
 		self.chan_listbox.setStyleSheet(combo_style)
+		self.chan_listbox.setPalette(self.custom_palette)
 		self.chan_listbox.setMinimumSize(qsize_min)
 		self.chan_listbox.setMaximumSize(qsize_max)
 		self.chan_listbox.setBaseSize(qsize_base)
 		self.chan_listbox.setStatusTip("Channels Configured")
 				
 		self.override_indexes_listbox.setStyleSheet(combo_style)
+		self.override_indexes_listbox.setPalette(self.custom_palette)
 		self.override_indexes_listbox.setMinimumSize(qsize_min)
 		self.override_indexes_listbox.setMaximumSize(qsize_max)
 		self.override_indexes_listbox.setBaseSize(qsize_base)
 		self.override_indexes_listbox.setStatusTip("Slot Overrides Configured")
 		
 		self.daytemp_indexes_listbox.setStyleSheet(combo_style)
+		self.daytemp_indexes_listbox.setPalette(self.custom_palette)
 		self.daytemp_indexes_listbox.setMinimumSize(qsize_min)
 		self.daytemp_indexes_listbox.setMaximumSize(qsize_max)
 		self.daytemp_indexes_listbox.setBaseSize(qsize_base)
 		self.daytemp_indexes_listbox.setStatusTip("Day Templates Configured")
 		
 		self.indexes_listbox.setStyleSheet(combo_style)
+		self.indexes_listbox.setPalette(self.custom_palette)
 		self.indexes_listbox.setMinimumSize(qsize_min)
 		self.indexes_listbox.setMaximumSize(qsize_max)
 		self.indexes_listbox.setBaseSize(qsize_base)
@@ -227,7 +247,9 @@ class edit42_win(QMainWindow):
 	def setup_toolbar(self):
 		searchbox_style='color: "#decce5"; background-color: "#382b52"; margin: 1px 5px; padding: 1px;'
 		self.toolbar = QToolBar("Primary toolbar")
+		self.toolbar.setPalette(self.custom_palette)
 		self.toolbar2= QToolBar("Secondary toolbar")
+		self.toolbar2.setPalette(self.custom_palette)
 		self.addToolBar(self.toolbar)
 		self.addToolBarBreak()
 		self.addToolBar(self.toolbar2)
@@ -239,6 +261,7 @@ class edit42_win(QMainWindow):
 		insertlist=['Insert...', 'Day Template', 'Slot Override', 'Time Slot']
 		self.insert_list.clear()
 		self.insert_list.addItems(insertlist)
+		self.insert_list.setPalette(self.custom_palette)
 		self.toolbar.addWidget(self.insert_list)
 		
 		self.toolbar2.addWidget(self.chan_listbox)
@@ -250,7 +273,7 @@ class edit42_win(QMainWindow):
 		self.searchbox.returnPressed.connect(self.on_searchbox_enterkey)
 		self.searchbox.editingFinished.connect(self.on_searchbox_click)
 		self.searchbox.setStatusTip("Search for Text")
-		self.searchbox.setStyleSheet(searchbox_style)
+		self.searchbox.setPalette(self.custom_palette)
 		self.searchbox.setClearButtonEnabled(True)
 		self.toolbar2.addWidget(self.searchbox)
 
@@ -390,11 +413,6 @@ class edit42_win(QMainWindow):
 		self.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
 		self.appclass42.switch_channel_data(self.chan_listbox.currentText())
 
-################################################################################
-######################----- Callbacks (insert page)-----########################
-################################################################################
-
-	
 
 ################################################################################
 ######################----- Callbacks   -----------########################
@@ -402,7 +420,7 @@ class edit42_win(QMainWindow):
 		
 	def on_changed_stack(self,index):
 		print("+-+-+-+-+-+-CCHanged from", self.previous_page, "to", index)
-		
+		#return
 		if index==1:
 			
 			if self.previous_page==2:
@@ -420,6 +438,7 @@ class edit42_win(QMainWindow):
 				self.toolbar2.show()
 				self.statusJ_lbl.clicked.connect(self.appclass42.mark_error_pos)
 				self.appclass42.open_cfg()
+				print("at startup", str(self.appclass42.chan_data)[:50])
 				
 		if index==2:
 			self.statusJ_lbl.clicked.connect(self.insert_form.mark_error_pos)

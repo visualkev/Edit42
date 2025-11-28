@@ -51,8 +51,9 @@ class edit42():
 		weekdays={}
 		weekdays[self.current_locale] = [date(2001, 1, i).strftime('%A') for i in range(1, 8)]
 		self.weekdays=weekdays
-		self.ok_styleb='color: "#bfb6cd"; padding: 5px; font-weight: bold;'
-		self.error_styleb='color: red; padding: 5px; font-weight: bold;'
+		com='background-color: "#27193c"; padding: 5px; font-weight: bold;'
+		self.ok_stylej='color: "#bfb6cd";'+ com
+		self.error_stylej='color: red;' + com
 		self.ok_style='color: "#bfb6cd"; padding: 5px;'
 		self.error_style='color: red; padding: 5px;'
 		self.slot_override_opts={'start_bump': "", 
@@ -228,6 +229,7 @@ class edit42():
 	################################################################
 			
 	def update_wintitle(self, changed=False):
+		print("at wintitle chan_data", str(self.chan_data)[:50])
 		title=f"{self.app_name} | {self.chan_data['channel_number']}: {self.chan_data['network_name']}"
 		if changed:
 			title=title+"*"
@@ -273,30 +275,31 @@ class edit42():
 
 	def fresh_indents(self):
 		print("Fresh")
-		self.win42.editbox.textChanged.disconnect()
-		obj=json.dumps(self.valid_json.valid_json, indent=4)
-		print("object type", type(obj), len(obj))
-		tc=self.win42.editbox.textCursor()
-		pos=tc.position()
-		
-		self.win42.editbox.setPlainText(obj)
-		self.win42.editbox.textChanged.connect(self.win42.on_text_changed_editbox)
-		tc.setPosition(pos, QTextCursor.MoveMode.MoveAnchor)
-		self.win42.editbox.setTextCursor(tc)
-		
-		self.win42.editbox.centerCursor()
+#		self.win42.editbox.textChanged.disconnect()
+#		obj=json.dumps(self.valid_json.valid_json, indent=4)
+#		print("object type", type(obj), len(obj))
+#		tc=self.win42.editbox.textCursor()
+#		pos=tc.position()
+#		
+#		self.win42.editbox.setPlainText(obj)
+#		self.win42.editbox.textChanged.connect(self.win42.on_text_changed_editbox)
+#		tc.setPosition(pos, QTextCursor.MoveMode.MoveAnchor)
+#		self.win42.editbox.setTextCursor(tc)
+#		
+#		self.win42.editbox.centerCursor()
 		
 
 	def check_content_change(self):
 		objstr=self.win42.editbox.toPlainText()
 		retval= self.valid_json.check(content=objstr)
 		
-		print(f"changed: {retval[0]}, syntax: {retval[1]}, schema: {retval[2]}")
+		print(f"at check_content_changed - changed: {retval[0]}, syntax: {retval[1]}, schema: {retval[2]}\n chan_data {str(self.chan_data)[:50]}")
 		if retval[0]:
 			if retval[1]:
 				#print("good")
 				self.win42.statusJ_lbl.setText(f"Json: OK")
-				self.win42.statusJ_lbl.setStyleSheet(self.ok_styleb)
+				self.win42.statusJ_lbl.setStyleSheet(self.ok_stylej)
+				print("valid json", self.valid_json.valid_json)
 				self.update_app_json(self.valid_json.valid_json)
 				self.is_changed=True
 				self.update_wintitle(changed=self.is_changed)
@@ -308,7 +311,7 @@ class edit42():
 				e=retval[3][0]
 				#print("syntax", e[:50])
 				self.win42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
-				self.win42.statusJ_lbl.setStyleSheet(self.error_styleb)
+				self.win42.statusJ_lbl.setStyleSheet(self.error_stylej)
 								
 			elif not retval[2]:
 				e=retval[3][0]
@@ -340,9 +343,11 @@ class edit42():
 	def flashit(self):
 		
 		if self.flash_count%2==0: 
-			self.win42.setStyleSheet('color: "#32fbe2"; background-color:"#461a8a"; selection-color: rgb(255, 255, 255); selection-background-color: "#5e5c64"; font: 16px Tahoma, sans-serif;')
+			print()
+			#self.win42.setStyleSheet('color: "#32fbe2"; background-color:"#461a8a"; selection-color: rgb(255, 255, 255); selection-background-color: "#5e5c64"; font: 16px Tahoma, sans-serif;')
 		else:
-			self.win42.setStyleSheet('color: "#32fbe2"; background-color:"#1a053a"; selection-color: rgb(255, 255, 255); selection-background-color: "#5e5c64"; font: 16px Tahoma, sans-serif;')
+			print()
+			#self.win42.setStyleSheet('color: "#32fbe2"; background-color:"#1a053a"; selection-color: rgb(255, 255, 255); selection-background-color: "#5e5c64"; font: 16px Tahoma, sans-serif;')
 		if self.flash_count<7:
 			self.flash_count+=1
 			self.flasher.start()
