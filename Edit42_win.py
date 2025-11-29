@@ -255,6 +255,8 @@ class edit42_win(QMainWindow):
 		self.addToolBar(self.toolbar2)
 		self.toolbar.setIconSize(QSize(32, 32))
 		self.toolbar.addAction(self.save_action)
+		toolButton = self.toolbar.widgetForAction(self.save_action)
+		toolButton.setStyleSheet('color: "#decce5"; background-color: #382b52;')
 		
 		self.insert_list=QComboBox(self.editor_page)
 		self.insert_list.setStatusTip("Insert Objects")
