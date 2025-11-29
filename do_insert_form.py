@@ -253,6 +253,7 @@ class Insert_form():
 	def on_btn_cancel(self):
 		print("cancel")
 		self.disable_events()
+		self.w42.ip_insert_preview.clear()
 		self.w42.edit42_stack.setCurrentIndex(1)
 		
 	def on_list_chg(self):

@@ -343,28 +343,39 @@ class edit42():
 	
 
 	def do_save(self):
+		name=None
 		if self.cfg_src=='api':
+			name=self.channel_selected
 			payload={'path': self.channel_selected, 'data': json.dumps({'station_conf':self.chan_data}, indent=4)}
 			ret=self.configs.set_api_conf(payload)
-			if ret=="Saved": self.set_saved_indicate()
-			else: self.error_save()
+			if ret=="Saved": self.set_saved_indicate(name)
+			else: self.error_save(name)
 				
 		else:
+			name=self.channel_selected['name']
 			cfg_file= self.channel_selected['path']
 			#print(cfg_file, self.chan_data)
 			payload={'path': cfg_file, 'data':{'station_conf':self.chan_data}}
 			ret=self.configs.set_file_conf(payload)
-			if ret=="Saved": self.set_saved_indicate()
-			else: self.error_save()
+			if ret=="Saved": self.set_saved_indicate(name)
+			else: self.error_save(name)
 		print("Saved")
 		self.is_changed=False
 		self.update_wintitle(changed=self.is_changed)
 	
-	def set_saved_indicate(self):
-		print("tbd")
+	def set_saved_indicate(self, name):
+		msgBox = QMessageBox()
+		msgBox.setIcon(QMessageBox.Icon.Information)
+		msgBox.setWindowTitle(f"{self.app_name} - Save Message - Ok")
+		msgBox.setText(f"{name} has successfully saved.")
+		msgBox.exec()
 
-	def error_save(self):
-		print("save ERROR")
+	def error_save(self, name):
+		msgBox = QMessageBox()
+		msgBox.setIcon(QMessageBox.Icon.Critical)
+		msgBox.setWindowTitle(f"{self.app_name} - Save Message - Error")
+		msgBox.setText(f"Error: Problem saving {name}")
+		msgBox.exec()
 
 	def open_cfg(self):
 #		fileName = QFileDialog.getOpenFileName(self.win42, "Open FS42 Station Config Files", "/home/kkurtz/Documents/bash-scripts/edit42/confs", "Json Files (*json)")
