@@ -1,5 +1,8 @@
+#!/usr/bin/python
+
 from pathlib import Path
-import json, os, glob, requests
+
+import json, os, glob, shutil, requests, posixpath
 
 dgrey="\033[30;48m"
 red="\033[31;48m"
@@ -11,14 +14,6 @@ lblue="\033[36;48m"
 lgrey="\033[37;48m"
 nc="\033[0m"
 
-class get_slots_framework():
-	def __init__(self):
-		self.conf_file=Path('/home/kkurtz/Documents/bash-scripts/station-ed42/slot-framework.json')
-		self.slot_fw=''
-		with open(self.conf_file, 'r') as file:
-			data = json.load(file)
-		self.slot_fw= data
-		#print(data['slot_items']['tags'])
 		
 class Get_confs():
 
@@ -26,7 +21,7 @@ class Get_confs():
 		self.headers={"Content-Type": "application/json"}
 		self.urlbase = 'http://localhost:4242/stations/'
 		self.url_summary = 'http://localhost:4242/summary/stations'
-		#self.url=self.urlbase
+		self.src=src
 		self.conf_dir=conf_path
 		self.chaninfo=[]
 		self.chanlist=[]
@@ -41,7 +36,7 @@ class Get_confs():
 		
 	def get_api_list(self):
 		try:
-			response = requests.get(self.url_summary, headers=self.headers) #, json=data)
+			response = requests.get(self.url_summary, headers=self.headers)
 		except requests.exceptions.RequestException as e:
 			print(f"\n\t{red}Is your fs42 running?{nc}\n\n")
 			exit()
@@ -49,16 +44,6 @@ class Get_confs():
 		self.chanlist=temp['network_names']
 		print(self.chanlist)
 
-		
-	def get_all_api(self):
-		print("TODO: update to work with new way")
-		return
-		try:
-			response = requests.get(self.url, headers=self.headers) #, json=data)
-		except requests.exceptions.RequestException as e:
-			print(f"\n\t{red}Is your fs42 running?{nc}\n\n")
-			exit()
-		self.chaninfo=response.json()
    		
 	def get_file_list(self):
 		temp=[]
@@ -72,7 +57,7 @@ class Get_confs():
 	
 	def get_api_conf(self, fyl):
 		try:
-			response = requests.get(f"{self.urlbase}{fyl}", headers=self.headers) #, json=data)
+			response = requests.get(f"{self.urlbase}{fyl}", headers=self.headers)
 		except requests.exceptions.RequestException as e:
 			print(f"\n\t{red}Is your fs42 running?{nc}\n\n")
 			exit()
@@ -104,11 +89,12 @@ class Get_confs():
 			data = json.load(conf)
 		return data['station_conf']
 
+
 	def set_file_conf(self, fyl):
 		#print(type(fyl['path']), fyl['path'])
 		try:
 			with open(fyl['path'], "w") as conf:
-				json.dump(fyl['data'], conf)
+				json.dump(fyl['data'], conf, indent=4)
 		except OSError:
 			print(f"{red}OS error{nc}")
 			return "Not Saved"
@@ -123,10 +109,36 @@ class Get_confs():
 		#print(" in get confs show me type of data", type(data))
 		return data
 	
-	
 	def set_snipp_file(self, fyl):
 		with open(fyl['path'], "w") as conf:
 			json.dump({'data':fyl['data']}, conf)
+
+		
+	def make_backup(self):
+		
+		if self.src=='file':
+			backup_dir=os.path.join(self.conf_dir, 'edit42-backup')
+			Path(backup_dir).mkdir(exist_ok=True)
+			for src in glob.glob(f"{self.conf_dir}/*.json"):
+				shutil.copy2(src, backup_dir, follow_symlinks=True)
+			
+		else:
+			Path('./edit42-backup').mkdir(exist_ok=True)
+			for chan in self.chanlist:
+				chan_data=self.get_api_conf(chan)
+				Path(f"./edit42-backup/{chan}.json").touch()
+				with Path(f"./edit42-backup/{chan}.json").open("w") as newfile:
+					json.dump(chan_data, newfile, indent=4)
+			
+		
 			
 			
+			
+	
+		
+			
+					
+					
+					
+					
 			

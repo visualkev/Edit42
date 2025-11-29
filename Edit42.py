@@ -7,7 +7,6 @@ from PySide6.QtCore import QRegularExpression, QTimer
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QFileDialog
 
 from Get_station_confs import Get_confs
-from Get_station_confs import get_slots_framework
 
 from Highlighter import Highlighter
 from json_valid import json_valid

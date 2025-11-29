@@ -438,6 +438,7 @@ class edit42_win(QMainWindow):
 				self.toolbar2.show()
 				self.statusJ_lbl.clicked.connect(self.appclass42.mark_error_pos)
 				self.appclass42.open_cfg()
+				self.appclass42.configs.make_backup()
 				self.editbox.setFocus()
 				
 		if index==2:
