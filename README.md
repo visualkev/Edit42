@@ -107,3 +107,4 @@ That all said, I did want to add something cool to the <a href="https://github.c
  - Optional ability to easily manage schedules with no direct json editing
  - Rule based merge/ blend of day templates
  - Bracket and quote matching
+ - Your ideas are welcomed
