@@ -10,6 +10,7 @@ This project is tremendously inspired by the FieldStation42 project
  - create, copy, save and insert custom slot overrides and day templates  
  - easy access to all your station configs via either direct file access or via API. configured at first run  
  - simple search functionality
+ - NEW - Configs are backed up at app start. If you set Edit42 to use file mode, then the edit42-backup folder will be in your confs directory. If you selected API mode then the edit42-backup will be in the app directory
  - cool styling
 
 ## Instructions:
