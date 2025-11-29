@@ -65,7 +65,7 @@ class edit42_win(QMainWindow):
 		self.custom_palette=custom_palette()
 		self.setPalette(self.custom_palette)
 		self.setup_part1()
-		print("init win", type(self.custom_palette))
+		print("init win")
 		self.previous_page=self.edit42_stack.currentIndex()
 
 		
@@ -75,7 +75,7 @@ class edit42_win(QMainWindow):
 		else:
 			
 			self.edit42_stack.setCurrentIndex(1)
-		self.insert_form=Insert_form(self.appclass42, self)
+		
 		
 	
 
@@ -258,7 +258,7 @@ class edit42_win(QMainWindow):
 		
 		self.insert_list=QComboBox(self.editor_page)
 		self.insert_list.setStatusTip("Insert Objects")
-		insertlist=['Insert...', 'Day Template', 'Slot Override', 'Time Slot']
+		insertlist=['Insert...', 'Day Template', 'Slot Override'] #, 'Time Slot']
 		self.insert_list.clear()
 		self.insert_list.addItems(insertlist)
 		self.insert_list.setPalette(self.custom_palette)
@@ -439,6 +439,7 @@ class edit42_win(QMainWindow):
 				self.statusJ_lbl.clicked.connect(self.appclass42.mark_error_pos)
 				self.appclass42.open_cfg()
 				self.appclass42.configs.make_backup()
+				self.insert_form=Insert_form(self.appclass42, self)
 				self.editbox.setFocus()
 				
 		if index==2:

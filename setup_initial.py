@@ -9,7 +9,9 @@ from PySide6.QtWidgets import (
 	QLabel,
 	QPushButton,
 	QRadioButton,
-	QLineEdit
+	QLineEdit,
+	QMessageBox,
+	QFileDialog,
 )
 
 class setup_initial():
@@ -98,10 +100,21 @@ class setup_initial():
 		QWidget.setTabOrder(self.w42.su_btn_filedialog, self.w42.su_access1_btn)
 		QWidget.setTabOrder(self.w42.su_access1_btn, self.w42.su_host_txt)
 		QWidget.setTabOrder(self.w42.su_host_txt, self.w42.su_btn_continue)
+		self.w42.su_btn_filedialog.clicked.connect(self.on_click_filedialog)
+		
+	def on_click_filedialog(self):
+		file=QFileDialog()
+		file.setFileMode(QFileDialog.FileMode.Directory)
+		file.setOptions(QFileDialog.Option.ShowDirsOnly)
+		if file.exec():
+			theDir = file.selectedFiles()
+			self.w42.su_path_txt.setText(theDir[0])
+			
 		
 	def on_radio_clicked(self):
 		print("toggled")
 		self.setup_states()
+		
 	def on_continue_clicked(self):
 		print("clicked")
 		if self.w42.su_access1_btn.isChecked():
@@ -116,12 +129,23 @@ class setup_initial():
 			print(d)
 			print(" path" , os.path.exists(d))
 			if os.path.exists(d):
-				self.save_confs({'file': d})	
+				self.save_confs({'file': d})
+			else:
+				msgBox = QMessageBox()
+				msgBox.setIcon(QMessageBox.Icon.Warning)
+				msgBox.setWindowTitle("Edit42 - Path not found")
+				msgBox.setText(f"{d} Was not found.")
+				msgBox.exec()
 	
 	def save_confs(self, data):
 		with open ("./edit42.conf", "w") as conf:
 			json.dump(data, conf)
 		self.w42.appconf=data
+		msgBox = QMessageBox()
+		msgBox.setIcon(QMessageBox.Icon.Information)
+		msgBox.setWindowTitle("Edit42 - Conf created")
+		msgBox.setText(f"Edit42 conf has been created.")
+		msgBox.exec()
 		self.w42.edit42_stack.setCurrentIndex(1)
 		
 		

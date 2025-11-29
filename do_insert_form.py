@@ -33,7 +33,6 @@ class Insert_form():
 		self.get_snipp_data()
 		self.merge_lists()
 
-		print("-----SSSsetup")
 		self.insert=start
 		self.w42.ip_name_lbl.setText(f"{start} Name:")
 		
@@ -346,6 +345,7 @@ class Insert_form():
 		self.w42.ip_list_of.currentIndexChanged.connect(self.on_list_chg)
 		
 	def get_snipp_data(self):
+		print("get_snipps appclass42", self.appclass42)
 		snipps=self.appclass42.configs.get_snipp_file({'path': './snippfile.json'})
 		if snipps==None:
 			return
