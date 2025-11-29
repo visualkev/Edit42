@@ -13,7 +13,7 @@ This project is tremendously inspired by the FieldStation42 project
  - NEW - Configs are backed up at app start. If you set Edit42 to use file mode, then the edit42-backup folder will be in your confs directory. If you selected API mode then the edit42-backup will be in the app directory
  - cool styling
 
-## Instructions:
+## Usage Guide:
 
 Clone this repo  
 Once you have the files, just do python main.py<br>
