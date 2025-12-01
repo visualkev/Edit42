@@ -52,7 +52,9 @@ class edit42_win(QMainWindow):
 	def __init__(self, appname, appversion, data, rect):
 		super().__init__()
 		self.appname=appname
+		icon=QIcon('./application42icon32.png')
 		self.setWindowTitle(appname)
+		self.setWindowIcon(icon)
 		self.win_width=770
 		#self.win_height=720
 		self.screen_rect=rect
