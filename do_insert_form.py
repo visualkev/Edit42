@@ -35,6 +35,8 @@ class Insert_form():
 
 		self.insert=start
 		self.w42.ip_name_lbl.setText(f"{start} Name:")
+		self.w42.ip_insert_preview.clear()
+		self.w42.ip_txtName.setText("Enter a name")
 		
 		self.setup_status_tips(self.insert)
 		
@@ -42,7 +44,8 @@ class Insert_form():
 		self.w42.ip_list_of.clear()
 		
 		if self.insert=='Slot Override':
-			if self.mso:
+			print("mso", type(self.mso), self.mso)
+			if len(self.mso)> 0:
 
 				self.w42.ip_list_of.addItems(self.mso)
 				self.w42.ip_list_of.insertItem(0, "Select Override")
@@ -50,7 +53,7 @@ class Insert_form():
 			else:
 				self.w42.ip_fr_new_chk.setChecked(True)
 		elif self.insert=='Day Template':
-			if self.mdt:
+			if len(self.mdt)> 0:
 
 				self.w42.ip_list_of.addItems(self.mdt)
 				self.w42.ip_list_of.insertItem(0, "Select Template")
@@ -58,11 +61,8 @@ class Insert_form():
 		
 			else:
 				self.w42.ip_fr_new_chk.setChecked(True)
-#			elif self.w42.insert=='Time Slot':
-#				for h in range(24):
-#					day_template
 		elif self.insert=='Tag Override':
-			if self.mto:
+			if len(self.mto)> 0:
 				self.w42.ip_list_of.addItems(self.mto)
 				self.w42.ip_list_of.insertItem(0, "Select Tag Override")
 				self.w42.ip_list_of.setCurrentText("Select Tag Override")
@@ -248,33 +248,40 @@ class Insert_form():
 		if valid is False: return
 		
 		self.w42.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
-		if self.insert=='Slot Override':
 
-			if self.w42.editbox.find('"slot_overrides": {'):
-				self.w42.editbox.moveCursor(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
-				tc=self.w42.editbox.textCursor()
-				tc.insertText(valid)
-				self.appclass42.fresh_indents()
-				self.w42.editbox.centerCursor()
-				
+		if self.insert=='Slot Override':
+			if self.w42.editbox.find('"slot_overrides": {'): # place new slot override in slot_overrides
+				foundit=True
 				self.w42.override_indexes_listbox.addItem(self.w42.ip_txtName.text())
+			elif self.w42.editbox.find('"channel_number":'): #or after channel_number if no slot overrides
+				foundit=True
+				# lets create slot_overrides along with the new entry
+				tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")
+				valid=f'"slot_overrides": {{ {tmp} }},'
+				self.w42.indexes_listbox.addItem('slot_overrides')
+				self.w42.override_indexes_listbox.addItem(self.w42.ip_txtName.text())
+							
 		elif self.insert=='Tag Override':
-		
-			if self.w42.editbox.find('"tag_overrides": {'):
+			if self.w42.editbox.find('"tag_overrides": {'): #place new override in tag_overrides
 				foundit=True
-			elif self.w42.editbox.find('"channel_number":'): #place tag overrides after channel_number
+			elif self.w42.editbox.find('"channel_number":'): #or after channel_number if no tag overrides
 				foundit=True
-				# no tag_overrides yet. lets create along with the entry
+				# lets create tag_overrides along with the new entry
 				tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")
 				valid=f'"tag_overrides": {{ {tmp} }},'
+				self.w42.indexes_listbox.addItem('tag_overrides')
 
 		elif self.insert=='Day Template':
-			if self.w42.editbox.find('"day_templates": {'):
-				self.w42.editbox.moveCursor(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
-				tc=self.w42.editbox.textCursor()
-				tc.insertText(valid)
-				self.w42.editbox.centerCursor()
+			if self.w42.editbox.find('"day_templates": {'): # place new template in day_templates
+				foundit=True
 				self.w42.daytemp_indexes_listbox.addItem(self.w42.ip_txtName.text())
+			elif self.w42.editbox.find('"channel_number":'): #or after channel_number if no day templates
+				foundit=True
+				# lets create day_templates along with the new entry
+				tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")
+				valid=f'"day_templates": {{ {tmp} }},'
+				self.w42.indexes_listbox.addItem('day_templates')
+				
 		if foundit:
 			print("if foundit")
 			self.w42.editbox.moveCursor(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
@@ -282,6 +289,7 @@ class Insert_form():
 			tc.insertText(valid)
 			self.appclass42.fresh_indents()
 			self.w42.editbox.centerCursor()
+			
 		print("inserted!")
 		self.disable_events()
 		self.w42.edit42_stack.setCurrentIndex(1)
