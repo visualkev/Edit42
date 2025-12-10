@@ -37,6 +37,11 @@ class Insert_form():
 		self.w42.ip_name_lbl.setText(f"{start} Name:")
 		self.w42.ip_insert_preview.clear()
 		self.w42.ip_txtName.setText("Enter a name")
+		self.w42.ip_txtName.selectAll()
+		self.w42.setTabOrder(self.w42.ip_txtName, self.w42.ip_fr_new_chk)
+		self.w42.setTabOrder(self.w42.ip_fr_new_chk, self.w42.ip_list_of)
+		self.w42.setTabOrder(self.w42.ip_list_of,  self.w42.ip_insert_preview)
+		self.w42.setTabOrder(self.w42.ip_insert_preview, self.w42.statusJ_lbl)
 		
 		self.setup_status_tips(self.insert)
 		
@@ -231,14 +236,14 @@ class Insert_form():
 		if retval[1]:
 			print("good")
 			self.w42.statusJ_lbl.setText(f"Json: OK")
-			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_styleb)
+			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_stylej)
 			tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")+ ","
 			return tmp
 		elif not retval[1]:
 			e=retval[3][0]
 			print("syntax", e[:50])
 			self.w42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
-			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_styleb)
+			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_stylej)
 			return False
 			
 			
@@ -382,15 +387,13 @@ class Insert_form():
 		tmp=self.w42.ip_insert_preview.toPlainText()
 		retval= self.valid_json.check(content=tmp, skip_change=True, skip_schema=True)
 		if retval[1]:
-			print("good")
 			self.w42.statusJ_lbl.setText(f"Json: OK")
-			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_styleb)
+			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_stylej)
 			tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")+ ","
 		elif not retval[1]:
 			e=retval[3][0]
-			print("syntax", e[:50])
 			self.w42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
-			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_styleb)
+			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_stylej)
 		
 	def reset_text4(self):
 		self.w42.ip_list_of.currentIndexChanged.disconnect()
