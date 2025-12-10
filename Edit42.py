@@ -71,6 +71,7 @@ class edit42():
 		tmp=copy.deepcopy(self.slot_override_opts)
 		self.time_slot_opts={'tags': 'folder'}
 		self.time_slot_opts.update(tmp)
+		self.tag_override_opts=copy.deepcopy(self.slot_override_opts)
 		self.station={"station_conf": {
 			"network_name": "New Channel",
 			"channel_number": 5,
@@ -176,7 +177,7 @@ class edit42():
 
 	def setup_indexes(self):
 		commons=['Select Element', 'Now Slot', 'channel_number', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-		other_settings=['autobump', 'slot_overrides', 'day_templates', 'clip_shows']
+		other_settings=['autobump', 'tag_overrides', 'slot_overrides', 'day_templates', 'clip_shows']
 		for other in other_settings:
 			if other in self.chan_data:
 				commons.insert(2, other)
@@ -274,7 +275,7 @@ class edit42():
 
 	def fresh_indents(self):
 		print("Fresh")
-		self.win42.editbox.textChanged.disconnect()
+		self.win42.editbox.blockSignals(True)
 		obj=json.dumps(self.valid_json.valid_json, indent=4)
 		
 		print("object type", type(obj), len(obj))
@@ -282,7 +283,7 @@ class edit42():
 		pos=tc.position()
 		
 		self.win42.editbox.setPlainText(obj)
-		self.win42.editbox.textChanged.connect(self.win42.on_text_changed_editbox)
+		self.win42.editbox.blockSignals(False)
 		tc.setPosition(pos, QTextCursor.MoveMode.MoveAnchor)
 		self.win42.editbox.setTextCursor(tc)
 		

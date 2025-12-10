@@ -56,7 +56,6 @@ class edit42_win(QMainWindow):
 		self.setWindowTitle(appname)
 		self.setWindowIcon(icon)
 		self.win_width=770
-		#self.win_height=720
 		self.screen_rect=rect
 		self.set_wingeom()
 		self.appversion=appversion
@@ -89,7 +88,6 @@ class edit42_win(QMainWindow):
 		self.setGeometry(x, 30, self.win_width, self.win_height)
 		
 	def do_insert(self):
-		print("do insert")
 		self.insert_form.setup(self.insert_list.currentText())
 		self.edit42_stack.setCurrentIndex(2)
 
@@ -262,7 +260,7 @@ class edit42_win(QMainWindow):
 		
 		self.insert_list=QComboBox(self.editor_page)
 		self.insert_list.setStatusTip("Insert Objects")
-		insertlist=['Insert...', 'Day Template', 'Slot Override'] #, 'Time Slot']
+		insertlist=['Insert...', 'Day Template', 'Slot Override', 'Tag Override'] #, 'Time Slot']
 		self.insert_list.clear()
 		self.insert_list.addItems(insertlist)
 		self.insert_list.setPalette(self.custom_palette)
@@ -332,7 +330,6 @@ class edit42_win(QMainWindow):
 	def on_insert_select(self):
 		self.list2top.timeout.connect(self.reset_text3)
 		self.list2top.start()
-		print("select")
 		self.do_insert()
 		
 

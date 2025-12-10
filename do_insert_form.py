@@ -38,7 +38,6 @@ class Insert_form():
 		
 		self.setup_status_tips(self.insert)
 		
-		
 		self.setup_highlight_rules()
 		self.w42.ip_list_of.clear()
 		
@@ -56,11 +55,18 @@ class Insert_form():
 				self.w42.ip_list_of.addItems(self.mdt)
 				self.w42.ip_list_of.insertItem(0, "Select Template")
 				self.w42.ip_list_of.setCurrentText("Select Template")
+		
 			else:
 				self.w42.ip_fr_new_chk.setChecked(True)
 #			elif self.w42.insert=='Time Slot':
 #				for h in range(24):
 #					day_template
+		elif self.insert=='Tag Override':
+			if self.mto:
+				self.w42.ip_list_of.addItems(self.mto)
+				self.w42.ip_list_of.insertItem(0, "Select Tag Override")
+				self.w42.ip_list_of.setCurrentText("Select Tag Override")
+			
 		self.setup_events()		
 	
 	def do_setup(self):
@@ -167,12 +173,22 @@ class Insert_form():
 	def merge_lists(self):
 		self.mso={}
 		self.mdt={}
+		self.mto={}
+		if 'tag_overrides' in self.appclass42.chan_data:
+			self.mto.update(self.appclass42.chan_data['tag_overrides'])
+		
+		if 'tag_overrides' in self.snipps_obj:
+			self.mto.update(self.snipps_obj['tag_overrides'])
+		
 		if 'slot_overrides' in self.appclass42.chan_data:
 			self.mso.update(self.appclass42.chan_data['slot_overrides'])
+		
 		if 'slot_overrides' in self.snipps_obj: 
 			self.mso.update(self.snipps_obj['slot_overrides'])
+			
 		if 'day_templates' in self.appclass42.chan_data:
 			self.mdt.update(self.appclass42.chan_data['day_templates'])
+			
 		if 'day_templates' in self.snipps_obj:
 			self.mdt.update(self.snipps_obj['day_templates'])
 		
@@ -209,21 +225,27 @@ class Insert_form():
 		self.w42.ip_btn_insert.setStatusTip(f"Click to insert your {item} into {station_name}")
 		self.w42.ip_btn_cancel.setStatusTip("Click to cancel")
 		
-	def on_btn_insert(self):
-		print("insert")
-		tmp=self.w42.ip_insert_preview.toPlainText()
-		retval= self.valid_json.check(content=tmp, skip_change=True, skip_schema=True)
+	def checkValid(self):
+		plainText=self.w42.ip_insert_preview.toPlainText()
+		retval= self.valid_json.check(content=plainText, skip_change=True, skip_schema=True)
 		if retval[1]:
 			print("good")
 			self.w42.statusJ_lbl.setText(f"Json: OK")
 			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_styleb)
 			tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")+ ","
+			return tmp
 		elif not retval[1]:
 			e=retval[3][0]
 			print("syntax", e[:50])
 			self.w42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
 			#self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_styleb)
-			return
+			return False
+			
+			
+	def on_btn_insert(self):
+		foundit=False
+		valid= self.checkValid()
+		if valid is False: return
 		
 		self.w42.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
 		if self.insert=='Slot Override':
@@ -231,20 +253,35 @@ class Insert_form():
 			if self.w42.editbox.find('"slot_overrides": {'):
 				self.w42.editbox.moveCursor(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
 				tc=self.w42.editbox.textCursor()
-				tc.insertText(tmp)
+				tc.insertText(valid)
 				self.appclass42.fresh_indents()
 				self.w42.editbox.centerCursor()
 				
 				self.w42.override_indexes_listbox.addItem(self.w42.ip_txtName.text())
-				#self.w42.editbox.
-			
+		elif self.insert=='Tag Override':
+		
+			if self.w42.editbox.find('"tag_overrides": {'):
+				foundit=True
+			elif self.w42.editbox.find('"channel_number":'): #place tag overrides after channel_number
+				foundit=True
+				# no tag_overrides yet. lets create along with the entry
+				tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")
+				valid=f'"tag_overrides": {{ {tmp} }},'
+
 		elif self.insert=='Day Template':
 			if self.w42.editbox.find('"day_templates": {'):
 				self.w42.editbox.moveCursor(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
 				tc=self.w42.editbox.textCursor()
-				tc.insertText(tmp)
+				tc.insertText(valid)
 				self.w42.editbox.centerCursor()
 				self.w42.daytemp_indexes_listbox.addItem(self.w42.ip_txtName.text())
+		if foundit:
+			print("if foundit")
+			self.w42.editbox.moveCursor(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
+			tc=self.w42.editbox.textCursor()
+			tc.insertText(valid)
+			self.appclass42.fresh_indents()
+			self.w42.editbox.centerCursor()
 		print("inserted!")
 		self.disable_events()
 		self.w42.edit42_stack.setCurrentIndex(1)
@@ -280,13 +317,13 @@ class Insert_form():
 						return
 					
 					self.set_txt_box(self.mso[copy])
-			case 'Time Slot':
+			case 'Tag Override':
 				if self.w42.ip_fr_new_chk.isChecked():
-					self.set_txt_box(self.appclass42.time_slot_opts)
+					self.set_txt_box(self.appclass42.tag_override_opts)
 				else:
 					if copy is None:
 						return
-					print()
+					self.set_txt_box(self.mto[copy])
 			case 'Day Template':
 				if self.w42.ip_fr_new_chk.isChecked():
 					self.set_txt_box(self.appclass42.day_template)
@@ -318,12 +355,20 @@ class Insert_form():
 			'object': obj}
 		
 		if self.insert=='Slot Override':
+			if 'slot_overrides' not in self.snipps_obj: self.snipps_obj['slot_overrides']={}
 			self.snipps_obj['slot_overrides'].update(obj)
+			self.mso.update(obj)
 		elif self.insert=='Day Template':
+			if 'day_templates' not in self.snipps_obj: self.snipps_obj['day_templates']={}
 			self.snipps_obj['day_templates'].update(obj)
 			self.mdt.update(obj)
+		elif self.insert=='Tag Override':
+			if 'tag_overrides' not in self.snipps_obj: self.snipps_obj['tag_overrides']={}
+			self.snipps_obj['tag_overrides'].update(obj)
+			self.mto.update(obj)
 		self.w42.ip_list_of.addItem(self.w42.ip_txtName.text())
 		self.appclass42.configs.set_snipp_file({'data': self.snipps_obj, 'path': './snippfile.json'})
+
 
 	def on_text_changed(self):
 		tmp=self.w42.ip_insert_preview.toPlainText()

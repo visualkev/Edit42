@@ -138,6 +138,13 @@
             "$ref": "#/$defs/timeSlotConfig"
           }
         },
+        "tag_overrides": {
+          "type": "object",
+          "description": "Tag-based override configurations applied when content from a specific tag path is selected",
+          "additionalProperties": {
+            "$ref": "#/$defs/timeSlotConfig"
+          }
+        },
         "autobump": {
           "type": "object",
           "description": "Auto-generated bump configuration",
@@ -307,8 +314,19 @@
           "description": "Whether to play sound (guide networks)"
         },
         "sound_to_play": {
-          "type": "string",
-          "description": "Path to sound file (guide networks)"
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to single sound file (guide networks)"
+            },
+            {
+              "type": "array",
+              "description": "Array of sound files to play on shuffle (guide networks)",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
         },
         "fullscreen": {
           "type": "boolean",
@@ -324,7 +342,7 @@
         },
         "window_decorations": {
           "type": "boolean",
-          "description": "Whether to show window decorations"
+          "description": "Whether to show window decorations "
         },
         "scroll_speed": {
           "type": "number",
