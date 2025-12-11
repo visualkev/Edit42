@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+
+dgrey="\033[30;48m"
+red="\033[31;48m"
+green="\033[32;48m"
+yel="\033[33;48m"
+blue="\033[34;48m"
+vio="\033[35;48m"
+lblue="\033[36;48m"
+lgrey="\033[37;48m"
+nc="\033[0m"
+
 import json
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QTextCharFormat , QColor, QTextCursor
@@ -49,7 +60,7 @@ class Insert_form():
 		self.w42.ip_list_of.clear()
 		
 		if self.insert=='Slot Override':
-			print("mso", type(self.mso), self.mso)
+			self.print_debug(f"mso, {type(self.mso)}, {self.mso}")
 			if len(self.mso)> 0:
 
 				self.w42.ip_list_of.addItems(self.mso)
@@ -71,11 +82,10 @@ class Insert_form():
 				self.w42.ip_list_of.addItems(self.mto)
 				self.w42.ip_list_of.insertItem(0, "Select Tag Override")
 				self.w42.ip_list_of.setCurrentText("Select Tag Override")
-			
 		self.setup_events()		
+
 	
 	def do_setup(self):
-		
 		self.w42.ip_vertl3 = QVBoxLayout(self.w42.insert_page)
 		self.w42.ip_vertl1= QVBoxLayout()
 		self.w42.ip_hl_row1 = QHBoxLayout()
@@ -170,10 +180,12 @@ class Insert_form():
 		self.w42.ip_horizl_buttons.addWidget(self.w42.ip_btn_cancel)
 		self.w42.ip_horizl_buttons.addWidget(self.w42.ip_btn_insert)
 		self.w42.ip_vertl3.addLayout(self.w42.ip_horizl_buttons)
-			
+
+		
 	def on_cancel_click(self):
-		print("cancel")
+		self.print_debug("cancel")
 		self.w42.edit42_stack.setCurrentIndex(1)
+
 
 	def merge_lists(self):
 		self.mso={}
@@ -198,7 +210,7 @@ class Insert_form():
 			self.mdt.update(self.snipps_obj['day_templates'])
 		
 	def setup_events(self):
-		print("setup events")
+		self.print_debug("setup events")
 		self.w42.ip_btn_insert.clicked.connect(self.on_btn_insert)
 		self.w42.ip_btn_cancel.clicked.connect(self.on_btn_cancel)
 		self.w42.ip_list_of.currentIndexChanged.connect(self.on_list_chg)
@@ -208,7 +220,7 @@ class Insert_form():
 		self.w42.ip_insert_preview.textChanged.connect(self.on_text_changed)
 	
 	def disable_events(self):
-		print("disable events")
+		self.print_debug("disable events")
 		self.w42.ip_btn_insert.clicked.disconnect()
 		self.w42.ip_btn_cancel.clicked.disconnect()
 		self.w42.ip_list_of.currentIndexChanged.disconnect()
@@ -234,14 +246,14 @@ class Insert_form():
 		plainText=self.w42.ip_insert_preview.toPlainText()
 		retval= self.valid_json.check(content=plainText, skip_change=True, skip_schema=True)
 		if retval[1]:
-			print("good")
+			self.print_debug("good")
 			self.w42.statusJ_lbl.setText(f"Json: OK")
 			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.ok_stylej)
 			tmp=json.dumps(self.valid_json.valid_json, indent=4).strip("{}")+ ","
 			return tmp
 		elif not retval[1]:
 			e=retval[3][0]
-			print("syntax", e[:50])
+			self.print_debug(f"syntax, {e[:50]}")
 			self.w42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
 			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_stylej)
 			return False
@@ -288,37 +300,49 @@ class Insert_form():
 				self.w42.indexes_listbox.addItem('day_templates')
 				
 		if foundit:
-			print("if foundit")
+			self.print_debug("if foundit")
 			self.w42.editbox.moveCursor(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
 			tc=self.w42.editbox.textCursor()
 			tc.insertText(valid)
 			self.appclass42.fresh_indents()
 			self.w42.editbox.centerCursor()
 			
-		print("inserted!")
+		self.print_debug("inserted!")
 		self.disable_events()
 		self.w42.edit42_stack.setCurrentIndex(1)
 			
 	def on_btn_cancel(self):
-		print("cancel")
+		self.print_debug("cancel")
 		self.disable_events()
 		self.w42.ip_insert_preview.clear()
 		self.w42.edit42_stack.setCurrentIndex(1)
 		
 	def on_list_chg(self):
-		print("--------list")
-		self.w42.list2top.timeout.connect(self.reset_text4)
+		self.print_debug("--------list")
+		self.w42.list2top.timeout.connect(self.reset_text4listbox)
 		self.w42.list2top.start()
 		copy=self.w42.ip_list_of.currentText()
 		self.process(copy)	
 		
 	def on_check_chg(self):
-		print("---------check")
+		self.print_debug("---------check")
 		self.process()
 
 	def on_return_pressed(self):
-		print("-----pressed")
+		self.print_debug("-----pressed")
 		self.process()
+
+
+	def print_debug(self, msg, lvl=1):
+		if lvl==1:
+			txt_color=lgrey
+		elif lvl==2:
+			txt_color=yel
+		else:
+			txt_color=red
+		if self.appclass42.debug:	
+			print(f"{txt_color}{msg}{nc}")
+			
 		
 	def process(self, copy=None):
 		match self.insert:
@@ -351,17 +375,17 @@ class Insert_form():
 		self.w42.ip_insert_preview.setPlainText(str(tmp))
 
 	def on_btn_snipp_save(self):
-		print("save snip")
+		self.print_debug("save snip")
 		if self.w42.ip_insert_preview.toPlainText()=='':
 			return
 		obj=self.w42.ip_insert_preview.toPlainText()
 		retval= self.valid_json.check(content=obj, skip_change=True, skip_schema=True)
 		 
 		if retval[1]:
-			print("good", retval)
+			self.print_debug(f"good, {retval}")
 			obj=self.valid_json.valid_json
 		else:
-			print("errors", retval[3])
+			self.print_debug(f"errors, {retval[3]}")
 			return
 		params={'name': self.w42.ip_txtName.text(), 
 			'type': self.insert, 
@@ -395,19 +419,19 @@ class Insert_form():
 			self.w42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
 			self.w42.statusJ_lbl.setStyleSheet(self.appclass42.error_stylej)
 		
-	def reset_text4(self):
-		self.w42.ip_list_of.currentIndexChanged.disconnect()
+	def reset_text4listbox(self):
+		self.w42.ip_list_of.blockSignals(True)
 		self.w42.ip_list_of.setCurrentIndex(0)
-		self.w42.ip_list_of.currentIndexChanged.connect(self.on_list_chg)
+		self.w42.ip_list_of.blockSignals(False)
 		
 	def get_snipp_data(self):
-		print("get_snipps appclass42", self.appclass42)
+		self.print_debug(f"get_snipps appclass42, {self.appclass42}")
 		snipps=self.appclass42.configs.get_snipp_file({'path': './snippfile.json'})
 		if snipps==None:
 			return
 		else:
 			self.snipps_obj=snipps['data']
-			#print("get snipp d", type(snipps), snipps['data'])
+			#self.print_debug("get snipp d, {type(snipps)}, {snipps['data']}")
 
 	def mark_error_pos(self):
 		tc=self.w42.ip_insert_preview.textCursor()

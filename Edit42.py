@@ -24,25 +24,24 @@ nc="\033[0m"
 
 
 class edit42():
-	def __init__(self, appname, appversion, appconf):
+	def __init__(self, appname, appversion, appconf, debug):
 		self.app_name=appname
 		self.app_version=appversion
 		self.appconf=appconf
+		self.debug=debug
 		if self.appconf is None:
-			print("No data")
+			self.print_debug("No data")
 		else: 
-			print("edit42 init", self.appconf.items())
+			self.print_debug(f"edit42 init, {self.appconf.items()}")
 			for k in self.appconf.items():
 				self.cfg_src=k[0]   #'file' ## 'api'
 				self.cfg_path=k[1]    #"./confs"
-		print(self.cfg_src, self.cfg_path)
+		self.print_debug(f"{self.cfg_src}, {self.cfg_path}")
 		self.is_changed=False
 		schema_file_json="./station_config_schema.json"
 		
 		self.chanlist=None
 		self.channel_selected=None
-		
-		self.debug=True
 		self.stations_list=[]
 		self.the_week=[]
 		self.the_day=[]
@@ -96,7 +95,10 @@ class edit42():
 		self.reindent.setInterval(3000)
 		self.reindent.setSingleShot(True)
 		self.reindent.timeout.connect(self.fresh_indents)
-		print("edit 42 init")
+		self.updateListBoxes=QTimer()
+		self.updateListBoxes.setInterval(10000)
+		self.updateListBoxes.timeout.connect(self.setup_indexes)
+		self.print_debug("edit 42 init")
 
 
 	def hili_now_slot(self):
@@ -107,18 +109,18 @@ class edit42():
 		self.win42.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
 		if type (self.chan_data[thedow]) is str:
 			dt=self.chan_data[thedow]
-			print(f"{thedow}: {dt}")
+			self.print_debug(f"{thedow}: {dt}")
 			self.win42.editbox.find('day_templates')
 			self.win42.editbox.find(dt)
 			#self.win42.editbox.find(thehour)
 			
 		elif type (self.chan_data[thedow]) is dict:
-			print(self.chan_data[thedow][thehour])
+			self.print_debug(self.chan_data[thedow][thehour])
 			self.win42.editbox.find(thedow)
 		
 		regstr=f'\\"{thehour}\\"\\s*:'
 		reg=QRegularExpression(regstr)
-		print(f"the reg {regstr}")
+		self.print_debug(f"the reg {regstr}")
 		self.win42.editbox.find(reg)
 		self.win42.editbox.centerCursor()
 		
@@ -170,12 +172,12 @@ class edit42():
 	def initialize_win(self, w42):
 		self.print_debug(f"edit 42.initialize_win. type {type(w42)}")
 		self.win42=w42
-		
 		self.configs=Get_confs(src=self.cfg_src, conf_path=self.cfg_path)
 		self.chanlist=self.configs.chanlist
 		
 
 	def setup_indexes(self):
+		self.toggleBoxBlock()
 		commons=['Select Element', 'Now Slot', 'channel_number', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 		other_settings=['autobump', 'tag_overrides', 'slot_overrides', 'day_templates', 'clip_shows']
 		for other in other_settings:
@@ -208,12 +210,18 @@ class edit42():
 				daytemp_indexes.append(dt)
 			daytemp_lb.addItems(daytemp_indexes)
 			daytemp_lb.setCurrentText("Select Template")
-		self.win42.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
+		if not self.updateListBoxes.isActive():
+			self.win42.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
+			self.print_debug("not active")
+		self.toggleBoxBlock(value=False)
+		self.updateListBoxes.start()
+		self.print_debug("setup indexes - indexed")
+
 		
 	def init_chan_listbox(self):
-		
+		self.win42.chan_listbox.blockSignals(True)
 		self.win42.chan_listbox.clear()
-		#print("chan list box",self.chanlist)
+		#self.print_debug("chan list box",self.chanlist)
 		if self.cfg_src=='api':
 			self.win42.chan_listbox.addItems(self.chanlist)
 			self.win42.chan_listbox.setCurrentText(self.channel_selected)
@@ -221,7 +229,19 @@ class edit42():
 			for i in self.chanlist:
 				self.win42.chan_listbox.addItem(i['name'])
 			self.win42.chan_listbox.setCurrentText(self.channel_selected['name'])
-	
+		self.win42.chan_listbox.blockSignals(False)
+		#self.win42.setup_event_slots()
+		
+
+	def toggleBoxBlock(self, value=True):
+		boxen=[self.win42.indexes_listbox, 
+			self.win42.daytemp_indexes_listbox, 
+			self.win42.override_indexes_listbox, 
+			self.win42.chan_listbox, 
+			self.win42.editbox, 
+			self.win42.insert_list]
+		for box in boxen:
+			box.blockSignals(value)
 
 
 	#########---------- Update functions --------###################
@@ -229,7 +249,6 @@ class edit42():
 	################################################################
 			
 	def update_wintitle(self, changed=False):
-		print("at wintitle chan_data", type(self.chan_data), str(self.chan_data)[:50])
 		title=f"{self.app_name} | {self.chan_data['channel_number']}: {self.chan_data['network_name']}"
 		if changed:
 			title=title+"*"
@@ -254,7 +273,7 @@ class edit42():
 		msgBox.setDefaultButton(QMessageBox.Save)
 		
 		if self.is_changed:
-			print("unsaved changes")
+			self.print_debug("unsaved changes")
 			ret = msgBox.exec()
 			if ret == QMessageBox.Save:
 				self.do_save()
@@ -274,11 +293,11 @@ class edit42():
 
 
 	def fresh_indents(self):
-		print("Fresh")
+		self.print_debug("Fresh")
 		self.win42.editbox.blockSignals(True)
 		obj=json.dumps(self.valid_json.valid_json, indent=4)
 		
-		print("object type", type(obj), len(obj))
+		self.print_debug(f"object type, {type(obj)}, {len(obj)}")
 		tc=self.win42.editbox.textCursor()
 		pos=tc.position()
 		
@@ -292,14 +311,15 @@ class edit42():
 
 	def check_content_change(self):
 		objstr=self.win42.editbox.toPlainText()
+		#self.print_debug("check_content - valid_json", type(self.valid_json), self.valid_json)
 		retval= self.valid_json.check(content=objstr)
 		
-		print(f"at check_content_changed - changed: {retval[0]}, syntax: {retval[1]}, schema: {retval[2]}\n chan_data {str(self.chan_data)[:50]}")
+		#self.print_debug(f"at check_content_changed - changed: {retval[0]}, syntax: {retval[1]}, schema: {retval[2]}\n chan_data {str(self.chan_data)[:50]}")
 		if retval[0]:
 			if retval[1]:
 				self.win42.statusJ_lbl.setText(f"Json: OK")
 				self.win42.statusJ_lbl.setStyleSheet(self.ok_stylej)
-				#print("valid json", str(self.valid_json.valid_json)[:55])
+				#self.print_debug("valid json", str(self.valid_json.valid_json)[:55])
 				self.update_app_json(self.valid_json.valid_json)
 				self.is_changed=True
 				self.update_wintitle(changed=self.is_changed)
@@ -310,19 +330,19 @@ class edit42():
 				
 			if not retval[1]:
 				e=retval[3][0]
-				#print("syntax", e[:50])
+				#self.print_debug("syntax", e[:50])
 				self.win42.statusJ_lbl.setText(f"Json: {e[:50].strip()}")
 				self.win42.statusJ_lbl.setStyleSheet(self.error_stylej)
 								
 			elif not retval[2]:
 				e=retval[3][0]
-				#print("schema", e[:50])
+				#self.print_debug("schema", e[:50])
 				self.win42.statusS_lbl.setText(f"<b>Schema</b>: {e[:50].strip()}")
 				self.win42.statusS_lbl.setStyleSheet(self.error_style)
 		elif not  retval[0]:
 			e=retval[3][0]
 			#self.reindent.start()
-			#print("no change", e[:50])
+			#self.print_debug("no change", e[:50])
 
 	def mark_error_pos(self):
 		tc=self.win42.editbox.textCursor()
@@ -355,12 +375,12 @@ class edit42():
 		else:
 			name=self.channel_selected['name']
 			cfg_file= self.channel_selected['path']
-			#print(cfg_file, self.chan_data)
+			#self.print_debug(cfg_file, self.chan_data)
 			payload={'path': cfg_file, 'data':{'station_conf':self.chan_data}}
 			ret=self.configs.set_file_conf(payload)
 			if ret=="Saved": self.set_saved_indicate(name)
 			else: self.error_save(name)
-		print("Saved")
+		self.print_debug("Saved")
 		self.is_changed=False
 		self.update_wintitle(changed=self.is_changed)
 	
@@ -380,8 +400,8 @@ class edit42():
 
 	def open_cfg(self):
 #		fileName = QFileDialog.getOpenFileName(self.win42, "Open FS42 Station Config Files", "/home/kkurtz/Documents/bash-scripts/edit42/confs", "Json Files (*json)")
-		print(self.chanlist)
-		print("open cfg")
+		self.print_debug(self.chanlist)
+		self.print_debug("open cfg")
 		if self.channel_selected==None:
 			self.channel_selected=self.chanlist[0]
 		else:	
@@ -394,9 +414,7 @@ class edit42():
 			self.chan_data=self.configs.get_file_conf(self.channel_selected)
 		else:
 			self.chan_data=self.configs.get_api_conf(self.channel_selected)
-		
-		
-		#print(self.chan_data)
+
 		self.init_chan_listbox()
 		self.update_wintitle()
 		self._highlighter = Highlighter()

@@ -37,17 +37,6 @@ from custom_palette import custom_palette
 from do_insert_form import Insert_form
 
 
-dgrey="\033[30;48m"
-red="\033[31;48m"
-green="\033[32;48m"
-yel="\033[33;48m"
-blue="\033[34;48m"
-vio="\033[35;48m"
-lblue="\033[36;48m"
-lgrey="\033[37;48m"
-nc="\033[0m"
-
-
 class edit42_win(QMainWindow):
 	def __init__(self, appname, appversion, data, rect):
 		super().__init__()
@@ -58,6 +47,7 @@ class edit42_win(QMainWindow):
 		self.win_width=770
 		self.screen_rect=rect
 		self.set_wingeom()
+		self.debug=False
 		self.appversion=appversion
 		self.appconf=data
 		self.last_search_cursor=None
@@ -66,7 +56,7 @@ class edit42_win(QMainWindow):
 		self.custom_palette=custom_palette()
 		self.setPalette(self.custom_palette)
 		self.setup_part1()
-		print("init win")
+		self.print_debug("init win")
 		self.previous_page=self.edit42_stack.currentIndex()
 
 		
@@ -77,7 +67,12 @@ class edit42_win(QMainWindow):
 			
 			self.edit42_stack.setCurrentIndex(1)
 		
-		
+	def print_debug(self, msg, lvl=0):
+		levels=["\033[37;48m", "\033[33;48m", "\033[31;48m"] 
+		txt_color=levels[lvl]
+		endColor="\033[0m"
+		if self.debug:	
+			print(f"{txt_color}{msg}{endColor}")		
 	
 
 	def set_wingeom(self):
@@ -123,7 +118,7 @@ class edit42_win(QMainWindow):
 		self.setStyleSheet('font: 16px Tahoma, sans-serif;')
 		
 	def setup_part2(self):
-		print("setup part2")
+		self.print_debug("setup part2")
 		self.setup_actions()
 		self.setup_menubar()
 		self.setup_comboboxes()
@@ -224,7 +219,7 @@ class edit42_win(QMainWindow):
 		self.indexes_listbox.setStatusTip("Other Config and Days")
 	
 	def setup_event_slots(self):
-		print("setup events")
+		self.print_debug("setup event slots")
 		self.indexes_listbox.currentIndexChanged.connect(self.on_index_changed)
 		self.daytemp_indexes_listbox.currentIndexChanged.connect(self.on_daytemp_changed)
 		self.override_indexes_listbox.currentIndexChanged.connect(self.on_override_changed)
@@ -294,6 +289,10 @@ class edit42_win(QMainWindow):
 			self.editbox.centerCursor()
 			self.last_search_cursor=self.editbox.textCursor()
 
+	def on_text_changed_editbox(self):
+		self.appclass42.check_content_change()
+
+
 	def on_quit_action(self):
 		msgBox = QMessageBox()
 		msgBox.setIcon(QMessageBox.Icon.Warning)
@@ -304,7 +303,7 @@ class edit42_win(QMainWindow):
 		msgBox.setDefaultButton(QMessageBox.Save)
 		
 		if self.appclass42.is_changed:
-			print("unsaved changes")
+			self.print_debug("unsaved changes")
 			ret = msgBox.exec()
 			if ret == QMessageBox.Save:
 				self.on_save_button_clicked()
@@ -319,10 +318,11 @@ class edit42_win(QMainWindow):
 				# should never be reached
 				return
 		else:
+			self.editbox.blockSignals(True)
 			self.close()
 
 	def on_searchbox_enterkey(self):
-		print("Enter")
+		self.print_debug("Enter")
 		if self.editbox.find(self.searchbox.text()):
 			self.editbox.centerCursor()
 			self.last_search_cursor=self.editbox.textCursor()
@@ -343,24 +343,20 @@ class edit42_win(QMainWindow):
 			hi_selection.cursor = thebox.textCursor()
 			hi_selection.cursor.clearSelection() 
 			thebox.setExtraSelections([hi_selection])    
-	
-	
-	def on_text_changed_editbox(self):
-		print("Changed!")
-		self.appclass42.check_content_change()
+
 
 	def on_save_button_clicked(self):
-		print("click save")
+		self.print_debug("click save")
 		self.appclass42.do_save()
 
 	def on_open_button_clicked(self, s):
-		print("click", s)
+		self.print_debug(f"click, {s}")
 		self.appclass42.open_cfg()
 
 	def on_index_changed(self, s):
 		self.list2top.timeout.connect(self.reset_text)
 		self.list2top.start()
-		print(f"indexes clicked {s} {self.indexes_listbox.currentText()}")
+		self.print_debug(f"indexes clicked {s} {self.indexes_listbox.currentText()}")
 		
 		if 'Now Slot'==self.indexes_listbox.currentText():
 			self.appclass42.hili_now_slot()
@@ -392,26 +388,28 @@ class edit42_win(QMainWindow):
 	def on_daytemp_changed(self, s):
 		self.list2top.timeout.connect(self.reset_text1)
 		self.list2top.start()
-		print(f"daytemp clicked {s} {self.daytemp_indexes_listbox.currentText()}")
+		self.print_debug(f"daytemp clicked {s} {self.daytemp_indexes_listbox.currentText()}")
 		self.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
 		if self.editbox.find(self.daytemp_indexes_listbox.currentText()):
 			self.editbox.centerCursor()
 			self.qts=self.editbox.textCursor()
-			print("found it")
+			self.print_debug("found it")
 			
 	def on_override_changed(self, s):
 		self.list2top.timeout.connect(self.reset_text2)
 		self.list2top.start()
-		print(f"override clicked {s} {self.override_indexes_listbox.currentText()}")
+		self.print_debug(f"override clicked {s} {self.override_indexes_listbox.currentText()}")
 		self.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
 		if self.editbox.find(self.override_indexes_listbox.currentText()):
 			self.editbox.centerCursor()
 			self.qts=self.editbox.textCursor()
-			print("found it")
+			self.print_debug("found it")
 
 	def on_chan_changed(self, s):
-		print(f"chan clicked {s} {self.chan_listbox.currentText()}")
+		self.print_debug(f"chan clicked {s} {self.chan_listbox.currentText()}")
+		self.editbox.blockSignals(True)
 		self.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
+		self.editbox.blockSignals(False)
 		self.appclass42.switch_channel_data(self.chan_listbox.currentText())
 
 
@@ -420,19 +418,19 @@ class edit42_win(QMainWindow):
 ################################################################################	
 		
 	def on_changed_stack(self,index):
-		print("+-+-+-+-+-+-CCHanged from", self.previous_page, "to", index)
+		self.print_debug(f"+-+-+-+-+-+-CCHanged from {self.previous_page} to {index}")
 		#return
 		if index==1:
 			
 			if self.previous_page==2:
-				print("already initialized", self.previous_page)
+				self.print_debug(f"already initialized {self.previous_page}")
 				self.toolbar.show()
 				self.toolbar2.show()
 				self.statusJ_lbl.clicked.connect(self.appclass42.mark_error_pos)
 				
 			elif self.previous_page==0:
-				print("initialize", index)
-				self.appclass42=edit42(self.appname, self.appversion, self.appconf)
+				self.print_debug(f"initialize {index}")
+				self.appclass42=edit42(self.appname, self.appversion, self.appconf, self.debug)
 				self.setup_part2()
 				self.appclass42.initialize_win(self)
 				self.toolbar.show()
