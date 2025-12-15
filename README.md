@@ -13,11 +13,18 @@ This project is tremendously inspired by the FieldStation42 project
  - NEW - Configs are backed up at app start. If you set Edit42 to use file mode, then the edit42-backup folder will be in your confs directory. If you selected API mode then the edit42-backup will be in the app directory
  - cool styling
 
+## Installation:
+ - `git clone https://github.com/visualkev/Edit42.git`
+ - `pip install pyside6`
+ - `pip install jsonschema`
+ - `pip install requests`
+ - from the edit42 directory, run `python main.py`
+<br>Note: this was developed on linux. I have just setup a windows 10 vm and the app is not 100% on that platform. I'll head down that rabbit hole soon enough.
+<br>
+
 ## Usage Guide:
-
-Clone this repo  
-Once you have the files, just do python main.py<br>
-
+<br>
+<br>
 <img width="550"  alt="Selection_455" src="https://github.com/user-attachments/assets/21bdc877-a69b-4eeb-83da-d4590a559c94" />     
 <br>
 <br>
