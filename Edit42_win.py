@@ -182,7 +182,7 @@ class edit42_win(QMainWindow):
 		
 	def setup_menubar(self):
 		menu = self.menuBar()
-		menu.setPalette(self.custom_palette)
+		
 		#print("setup menubar actionlist", self.actionList.keys())
 		file_menu = menu.addMenu("&File")
 		file_menu.addAction(self.actionList['File'][0])
@@ -196,7 +196,8 @@ class edit42_win(QMainWindow):
 			slotprop_menu.addAction(cfgInsert)
 		insert_slot=QAction("Insert time slot")
 		insert_menu.addAction(insert_slot)
-		
+		#menu.setPalette(self.custom_palette)
+		#menu.styleSheet("color: black;")
 			
 		
 		
