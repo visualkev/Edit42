@@ -32,8 +32,7 @@ class Get_confs():
 			self.urlbase=f"{conf_path}/stations/"
 			self.url_summary=f"{conf_path}/summary/stations"
 			self.get_api_list()
-		
-		
+				
 	def get_api_list(self):
 		try:
 			response = requests.get(self.url_summary, headers=self.headers)
@@ -47,7 +46,8 @@ class Get_confs():
    		
 	def get_file_list(self):
 		temp=[]
-		for conf_file in glob.glob(f"{self.conf_dir}/*.json"): #os.listdir(self.conf_dir):
+		#print("get file list")
+		for conf_file in Path(self.conf_dir).glob('*.json'):
 			if conf_file != os.path.join(self.conf_dir, "main_config.json"):
 				ret=self.get_network_name(conf_file)
 				if ret!=None:
@@ -119,7 +119,9 @@ class Get_confs():
 		if self.src=='file':
 			backup_dir=os.path.join(self.conf_dir, 'edit42-backup')
 			Path(backup_dir).mkdir(exist_ok=True)
-			for src in glob.glob(f"{self.conf_dir}/*.json"):
+			#print("Make backup - self.conf_dir",self.conf_dir)
+			for src in Path(self.conf_dir).glob('*.json'):
+				#print("src and backup dir", src, backup_dir)
 				shutil.copy2(src, backup_dir, follow_symlinks=True)
 			
 		else:

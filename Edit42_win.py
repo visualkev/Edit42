@@ -35,6 +35,7 @@ from PySide6.QtWidgets import (
 from Edit42 import edit42
 from custom_palette import custom_palette
 from do_insert_form import Insert_form
+import constants
 
 
 class edit42_win(QMainWindow):
@@ -149,34 +150,56 @@ class edit42_win(QMainWindow):
 		
 	
 	def setup_actions(self):
-		self.open_action = QAction("&Open", self)
-		self.open_action.setStatusTip("Click to open")
-		self.open_action.triggered.connect(self.on_open_button_clicked)
-		self.open_action.setShortcut(QKeySequence.Open)
+		self.actionList={}
+		list1=[]
+		list2=[]
+		actionCfgListFile=[
+			("&Open","Click to open", self.on_open_button_clicked, QKeySequence.Open),
+			("&New Station", "Create new Station", None, QKeySequence.New),
+			("&Save", "Click to save", self.on_save_button_clicked, QKeySequence.Save),  
+			("&Quit", "Click to quit", self.on_quit_action, QKeySequence.Quit)
+		]
+		for action in actionCfgListFile:
+			
+			actionObj=QAction(f"{action[0]}", self)
+			actionObj.setStatusTip(action[1])
+			if action[2] is not None: actionObj.triggered.connect(action[2])
+			if action[3] is not None: actionObj.setShortcut(action[3])
+			if action[0]=="&Save": self.save_action=actionObj
+			list1.append(actionObj)
+		self.actionList.update({'File': list1})
 		
-		self.save_action = QAction("&Save", self)
-		self.save_action.setStatusTip("Click to save")
-		self.save_action.triggered.connect(self.on_save_button_clicked)
-		self.save_action.setShortcut(QKeySequence.Save)
 		
-		self.quit_action = QAction("&Quit", self)
-		self.quit_action.setStatusTip("Click to quit")
-		self.quit_action.triggered.connect(self.on_quit_action)
-		self.quit_action.setShortcut(QKeySequence.Quit)
 		
-		self.new_action=QAction("&New Station", self)
-		self.new_action.setStatusTip("Create new Station")
-		self.new_action.setShortcut(QKeySequence.New)
+		for k in constants.slotProperties.keys():
+			#print(f"FILE!!{self.actionList['File']}\n")
+			actionObj=QAction(k, self)
+			list2.append(actionObj)
+		
+		self.actionList.update({'Slot property': list2})
+		
+		
 		
 	def setup_menubar(self):
 		menu = self.menuBar()
 		menu.setPalette(self.custom_palette)
+		#print("setup menubar actionlist", self.actionList.keys())
 		file_menu = menu.addMenu("&File")
-		file_menu.addAction(self.open_action)
-		file_menu.addAction(self.new_action)
-		file_menu.addAction(self.save_action)
+		file_menu.addAction(self.actionList['File'][0])
+		file_menu.addAction(self.actionList['File'][1])
+		file_menu.addAction(self.actionList['File'][2])
 		file_menu.addSeparator()
-		file_menu.addAction(self.quit_action)
+		file_menu.addAction(self.actionList['File'][3])
+		insert_menu=menu.addMenu("&Insert")
+		slotprop_menu=insert_menu.addMenu("&Slot property")
+		for cfgInsert in self.actionList['Slot property']:
+			slotprop_menu.addAction(cfgInsert)
+		insert_slot=QAction("Insert time slot")
+		insert_menu.addAction(insert_slot)
+		
+			
+		
+		
 
 
 	def setup_comboboxes(self):
