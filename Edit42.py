@@ -103,9 +103,9 @@ class edit42():
 
 	def hili_now_slot(self):
 		current=datetime.now()
-		
 		thedow=current.strftime("%A").lower()
-		thehour=current.strftime("%-H")
+		thehour=current.strftime("%H")
+		thehour=thehour.lstrip('0')
 		self.win42.editbox.moveCursor(QTextCursor.MoveOperation.Start, QTextCursor.MoveMode.MoveAnchor)
 		if type (self.chan_data[thedow]) is str:
 			dt=self.chan_data[thedow]
